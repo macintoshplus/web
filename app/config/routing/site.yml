@@ -51,6 +51,10 @@ newsletter_subscribe:
   path: /newsletter-subscribe
   defaults: {_controller: AppBundle:Newsletter:subscribe}
 
+newsletter_subscribe_confirm:
+  path: /newsletter-subscribe/{token}
+  defaults: {_controller: AppBundle:Newsletter:confirmSubscribe}
+
 membership_payment:
   path: /paybox-callback
   defaults: {_controller: AppBundle:MemberShip:payboxCallback}

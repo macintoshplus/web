@@ -1,0 +1,7 @@
+{% extends ':mail:_base_mail.html.twig' %}
+{% block content %}
+    <p>
+        Pour confirmer votre inscription veuillez cliquer sur ce lien :<br>
+        <a href="{{ url('newsletter_subscribe_confirm', {token: tokenb64}) }}">{{ url('newsletter_subscribe_confirm', {token: tokenb64}) }}</a>
+    </p>
+{% endblock %}

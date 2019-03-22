@@ -1,0 +1,15 @@
+{% extends ':site:base.html.twig' %}
+{% block inner_content %}
+    <article id="company-membership">
+        <h1>Inscription à la newsletter de l'AFUP</h1>
+        {% if success %}
+            <p>C'est presque fini !</p>
+            <p>
+                Nous vous avons envoyé un courriel de confirmation avec un lien de validation. Veuillez vérifier votre boîte courriel pour valider votre inscription.
+            </p>
+        {% else %}
+            <p>Une erreur est survenue lors de l'enregistrement de votre adresse. Vous pouvez essayer un peu plus tard
+                ou nous avertir à bonjour [at] afup.org</p>
+        {% endif %}
+    </article>
+{% endblock %}
