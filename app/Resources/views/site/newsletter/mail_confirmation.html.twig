@@ -1,7 +1,32 @@
 {% extends ':mail:_base_mail.html.twig' %}
 {% block content %}
+    <style>
+        .button {
+            background: #ed0678;
+            color: #ffffff;
+            width: auto;
+            padding: 0.4em 1em;
+            border: none;
+            cursor: pointer;
+            font-family: Belgrano, serif;
+            transition: background-color 0.5s;
+            text-decoration: none;
+        }
+    </style>
     <p>
-        Pour confirmer votre inscription veuillez cliquer sur ce lien :<br>
-        <a href="{{ url('newsletter_subscribe_confirm', {token: tokenb64}) }}">{{ url('newsletter_subscribe_confirm', {token: tokenb64}) }}</a>
+        Vous souhaitez enregistrer votre adresse courriel pour recevoir les superbes news de la communauté PHP française.<br>Merci à vous !
     </p>
+    <p>
+        Pour confirmer votre inscription veuillez cliquer sur ce lien (valable 24h) :
+    </p>
+    <p style="text-align: center"><a class="button" href="{{ url('newsletter_subscribe_confirm', {token: tokenb64}) }}">Confirmer mon abonnement à la newsletter</a></p>
+    <p>
+        Si cela ne fonctionne pas, copier le lien puis collez-le dans votre navigateur.<br>
+        <span style="font-size: smaller">{{ url('newsletter_subscribe_confirm', {token: tokenb64}) }}</span>
+    </p>
+    <p>
+        Si vous n'êtes pas à l'origine de cette demande, ne tenez pas compte de ce courriel.
+        <span style="font-size: smaller">Si vous ne cliquez pas sur ce lien nous n'aurons pas votre adresse courriel.</span>
+    </p>
+
 {% endblock %}

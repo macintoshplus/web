@@ -24,17 +24,24 @@ class NewsletterController extends SiteBaseController
             $key = base64_decode($keyb64);
             $ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
             $iv = openssl_random_pseudo_bytes($ivlen);
-            $ciphertext_raw = openssl_encrypt($subscribeForm->getData()['email'], $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
-            $hmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary=true);
-            $ciphertext = base64_encode( $iv.$hmac.$ciphertext_raw );
-            $base64Url = str_replace(['+', '/', '='], ['-', '_', ''], $ciphertext);
+            $datas = json_encode(['courriel'=>$subscribeForm->getData()['email'], 'time'=>time()]);
+            $success = false;
+            if ($datas !== false) {
+                $ciphertext_raw = openssl_encrypt($datas, $cipher, $key, $options = OPENSSL_RAW_DATA, $iv);
+                $hmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary = true);
+                $ciphertext = base64_encode($iv . $hmac . $ciphertext_raw);
+                $base64Url = str_replace(['+', '/', '='], ['-', '_', ''], $ciphertext);
 
-            $success = Mailing::envoyerMail(
-                array($GLOBALS['conf']->obtenir('mails|email_expediteur'), $GLOBALS['conf']->obtenir('mails|nom_expediteur')),
-                array($subscribeForm->getData()['email'], ''),
-                'Inscription à la Newsletter de l\'AFUP',
-                $this->renderView('site/newsletter/mail_confirmation.html.twig', ['tokenb64'=> $base64Url])
-            );
+                $success = Mailing::envoyerMail(
+                    array(
+                        $GLOBALS['conf']->obtenir('mails|email_expediteur'),
+                        $GLOBALS['conf']->obtenir('mails|nom_expediteur')
+                    ),
+                    array($subscribeForm->getData()['email'], ''),
+                    'Inscription à la Newsletter de l\'AFUP',
+                    $this->renderView('site/newsletter/mail_confirmation.html.twig', ['tokenb64' => $base64Url])
+                );
+            }
 
             return $this->render(':site/newsletter:confirmsubscribe.html.twig', ['success' => $success]);
         }
@@ -58,20 +65,28 @@ class NewsletterController extends SiteBaseController
         $calcmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary=true);
 
         $success = false;
-        if (hash_equals($hmac, $calcmac))//PHP 5.6+ timing attack safe comparison
-        {
-
-            try {
-                $this->get('app.mailchimp_api')->subscribeAddress(
-                    $this->getParameter('mailchimp_subscribers_list'),
-                    $original_plaintext
-                );
-                $success = true;
-            } catch (\Exception $e) {
-                $success = false;
-            }
+        //Le hash du texte ne correspond pas
+        if (!hash_equals($hmac, $calcmac)) {
+                return $this->render(':site/newsletter:postsubscribe.html.twig', ['success' => $success, 'error'=>1]);
         }
-        return $this->render(':site/newsletter:postsubscribe.html.twig', ['success' => $success]);
+        //Le Json n'est pas valide ou la demande à plus de 24h
+        $datas = json_decode($original_plaintext, true);
+        if ($datas === false || $datas['time']+(24*60*60) < time()) {
+            return $this->render(':site/newsletter:postsubscribe.html.twig', ['success' => $success, 'error'=>2]);
+        }
+        //Enregistrement de l'adresse
+        try {
+            $this->get('app.mailchimp_api')->subscribeAddress(
+                $this->getParameter('mailchimp_subscribers_list'),
+                $datas['courriel']
+            );
+            $success = true;
+        } catch (\Exception $e) {
+            $success = false;
+        }
+
+
+        return $this->render(':site/newsletter:postsubscribe.html.twig', ['success' => $success, 'error'=>3]);
     }
 
     private function getSubscriberType()
