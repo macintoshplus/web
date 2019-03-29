@@ -21,7 +21,7 @@ function afficherMessage($message, $url, $erreur = false) {
  *
  * @param   string  $url        URL pour l'attribut "action" du formulaire
  * @param   string  $nom        Nom du formulaire
- * @return  object
+ * @return  HTML_QuickForm
  */
 function &instancierFormulaire($url = null, $nom = 'formulaire') {
     if (is_null($url)) {

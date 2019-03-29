@@ -30,6 +30,8 @@ class LegacyController extends Controller
 
         $flashBag = $this->get('session')->getFlashBag();
 
+        $container = $this->container;
+
         if ($_GET['page'] == 'index' or !file_exists(dirname(__FILE__) . '/../../../htdocs/pages/administration/' . $_GET['page'] . '.php')) {
             $_GET['page'] = 'accueil';
         }
