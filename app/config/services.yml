@@ -12,6 +12,15 @@ services:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 
+
+    AppBundle\Configuration\Controller\ConfigurationPageController:
+        autowire: true
+        tags: ['controller.service_arguments']
+
+    AppBundle\Configuration\Repository\ConfigRepository:
+        factory: ["@ting", get]
+        arguments: [AppBundle\Configuration\Repository\ConfigRepository]
+
     my_github_authenticator:
         class: AppBundle\Security\MyGithubAuthenticator
         autowire: true

@@ -365,6 +365,13 @@ ting:
                 default:
                     connection: main
                     database: "%database_name%"
+        configuration:
+            namespace: AppBundle\Configuration\Repository
+            directory: "@AppBundle/Configuration/Repository"
+            options:
+                default:
+                    connection: main
+                    database: "%database_name%"
 
 knpu_oauth2_client:
     clients:

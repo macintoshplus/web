@@ -54,3 +54,7 @@ admin_members_reporting:
 admin_techletter:
   resource: "techletter_admin.yml"
   prefix: /techletter
+
+admin_configuration:
+  path: /config
+  defaults: {_controller: AppBundle\Configuration\Controller\ConfigurationPageController::__invoke}
