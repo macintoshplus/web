@@ -12,6 +12,9 @@ use AppBundle\Email\Mailer\Message;
 
 class Facture
 {
+    private $cipher  = 'aes-256-cbc';
+    private $key = 'PaiementFactureAFUP_AFUP';
+
     /**
      * @var \Afup\Site\Utils\Base_De_Donnees
      */
@@ -22,6 +25,24 @@ class Facture
         $this->_bdd = $bdd;
     }
 
+
+    public function encryptLink($data)
+    {
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($this->cipher));
+
+        return str_replace(['+','/'] , ['-','_'], base64_encode(openssl_encrypt($data, $this->cipher, $this->key, 0, $iv) . '::' . $iv));
+    }
+
+    public function decryptLink($data)
+    {
+        $decoded = base64_decode(str_replace(['-', '_'], ['+', '/'],$data));
+        if ($decoded === false || strpos($decoded, '::') === false) {
+            return false;
+        }
+        list($encrypted_data, $iv) = explode('::', $decoded);
+
+        return openssl_decrypt($encrypted_data, $this->cipher, $this->key, 0, $iv);
+    }
 
     /* Journal des opération
      *
